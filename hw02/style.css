@@ -1,0 +1,89 @@
+body {
+    width: 800px;
+    background-color: white;
+    margin: auto;
+    padding: 20px;
+}
+
+html {
+    background-color: lightblue;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    width:800px;
+    background-color: white;
+}
+
+.title {
+    font-size: 100px;
+    text-align: center;
+}
+/* navbar */
+nav {
+    width: 100%;
+}
+
+nav ul {
+    display: flex;
+    padding: 0;
+    height: inherit;
+}
+
+nav ul li {
+    flex: 1;
+    text-align: center;
+    list-style: none;
+    height: inherit;
+    vertical-align: middle;
+}
+
+nav ul li:first-of-type {
+    border-top-left-radius:15px;
+    border-bottom-left-radius:15px;
+}
+
+nav ul li:last-of-type {
+    border-top-right-radius:15px;
+    border-bottom-right-radius:15px;
+}
+
+
+nav li {
+    box-sizing: border-box;
+    background-color: rgb(26, 28, 26);
+    float: left;
+    width:100%;
+    height: inherit;
+}
+
+nav li:hover {
+    background-color: rgb(91, 91, 91);
+}
+
+nav li.current {
+    background-color: rgb(0, 47, 5);
+}
+nav li.current:hover {
+    background-color: rgb(2, 88, 11);
+}
+
+nav a {
+    padding-top: 1em;
+    padding-bottom: 1em;
+    width:100%;
+    height: inherit;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    vertical-align: middle;
+    float:left;
+}
+/* content */
+.content {
+    margin-top: 450px;
+    margin-left: 100px;
+    margin-right: 100px;
+    text-align: center;
+}
