@@ -20,10 +20,13 @@ header {
 .title {
     font-size: 100px;
     text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 /* navbar */
 nav {
-    width: 100%;
+    width: 600px;
+    margin: auto;
 }
 
 nav ul {
@@ -82,8 +85,29 @@ nav a {
 }
 /* content */
 .content {
-    margin-top: 450px;
+    margin-top: 300px;
     margin-left: 100px;
     margin-right: 100px;
-    text-align: center;
+}
+/* project styling */
+.project .image {
+    min-width: 300px;
+    min-height: 300px;
+    border-color: black;
+    border-width: 3px;
+    border-style: solid;
+}
+
+.project img {
+    width: inherit;
+    height: inherit;
+}
+
+.project .description {
+    padding-left: 2em;
+    padding-right: 1em;
+}
+
+.project {
+    display: flex;
 }
