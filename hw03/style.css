@@ -1,0 +1,40 @@
+html {
+    background-color: gray;
+}
+
+.title {
+    text-align: center;
+    padding-top: 1em;
+    padding-bottom: 0.5em;
+}
+
+body {
+    width: 600px;
+    margin: auto;
+    background-color: darkgray;
+}
+
+.grid {
+    width: 500px;
+    height: 500px;
+    margin: auto;
+}
+
+.cell:hover {
+    border: 5px solid black;
+}
+
+.cell {
+    flex-basis: 10%;
+    flex-grow: 1;
+    flex-shrink: 0;
+}
+
+.button {
+    text-align: center;
+}
+
+#resetButton {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
