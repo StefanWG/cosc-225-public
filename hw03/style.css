@@ -5,7 +5,6 @@ html {
 .title {
     text-align: center;
     padding-top: 1em;
-    padding-bottom: 0.5em;
 }
 
 body {
@@ -37,4 +36,9 @@ body {
 #resetButton {
     margin-top: 50px;
     margin-bottom: 50px;
+}
+
+h3 {
+    text-align: center;
+    margin-bottom: 30px;
 }
