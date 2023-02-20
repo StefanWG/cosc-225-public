@@ -24,7 +24,6 @@ body {
 }
 
 .cell {
-    flex-basis: 10%;
     flex-grow: 1;
     flex-shrink: 0;
 }

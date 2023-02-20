@@ -1,11 +1,12 @@
-let NUMROWS = 10;
-let NUMCOLS = 10;
+var NUMROWS = 10;
+var NUMCOLS = 10;
 
 function getColor(row, col) {
     // Calc color
     let hue = ((row+col)*(row+col)).toString();
-    let sat = (70-row*1).toString() + "%";
-    let lig = (50-row*3).toString() + "%";
+    let sat = ((70-row*1) % 100).toString() + "%";
+    let l = ((59-row*3) % 100 + 100) % 100 
+    let lig = (l).toString() + "%";
     let color = "hsl("+hue+","+sat+","+lig+")";
     return color;
 }
@@ -35,7 +36,7 @@ function updateColor(row, col) {
             let r = row + i;
             let c = col + j;
             if (i != 0 || j != 0) {
-                if (r > -1 & r < 10 & c > -1 & c < 10) {
+                if (r > -1 & r < NUMROWS & c > -1 & c < NUMCOLS) {
                     updateColorNeighbor(r, c);
                 }
             }
@@ -60,7 +61,6 @@ function updateColorNeighbor(row, col) {
     hsl = hsl.slice(4, -1).split(",");
     const newL = ((parseInt(hsl[2].replace("%",""))+10) % 100).toString();
     const newHsl = "hsl("+hsl[0]+","+hsl[1]+","+newL+"%)";
-    console.log(newHsl);
     // Add new class and update color
     cell.classList.add(newHsl);
     cell.style.backgroundColor = newHsl;
@@ -92,7 +92,7 @@ function drawGrid() {
         // Create row and add csss
         let row = document.createElement("div");
         row.classList.add("gridRow");
-        row.style.height = "10%"
+        row.style.height = (100/NUMCOLS).toString()+"%"
         row.style.display = "flex";
         for (let c = 0; c < NUMCOLS; c++) {
             // Create cell
@@ -104,7 +104,7 @@ function drawGrid() {
             cell.classList.add(hsl);
             cell.style.backgroundColor = hsl;
             cell.style.height = "100%";
-            cell.style.width = "100%";
+            cell.style.flexBasis = (100/NUMROWS).toString()+"%";
             cell.style.boxSizing = "border-box";
             // Add event listener
             cell.addEventListener("click", function() {
@@ -117,6 +117,33 @@ function drawGrid() {
 
     //Add listener to reset button
     const resetButton = document.getElementById("resetButton");
-    resetButton.addEventListener("click", resetGrid)
-
+    resetButton.addEventListener("click", resetGrid);
+    //Add listener to reset button
+    const incButton = document.getElementById("incButton");
+    incButton.addEventListener("click", incSize);
+    //Add listener to reset button
+    const decButton = document.getElementById("decButton");
+    decButton.addEventListener("click", decSize);
 }
+
+function incSize() {
+    if (NUMROWS < 20) {
+        NUMROWS += 1;
+        NUMCOLS += 1;
+        const grid = document.querySelector(".grid");
+        grid.innerHTML = "";
+        drawGrid();
+    }
+}
+
+function decSize() {
+    if (NUMROWS > 1) {
+        NUMROWS -= 1;
+        NUMCOLS -= 1;
+        const grid = document.querySelector(".grid");
+        grid.innerHTML = "";
+        drawGrid();
+    }
+}
+
+
