@@ -1,0 +1,91 @@
+h1 {
+    text-align: center;
+    position: fixed;
+    margin:auto;
+    top: 0px;
+    left:0px;
+    padding-top: 25px;
+    width: 100%;
+    background-color: white;
+    z-index:2;
+}
+#root {
+    position: relative;
+    margin-top: 80px;
+}
+
+.buttons {
+    margin: auto;
+    width: 1200px;
+    justify-content: center;
+    display: flex;
+}
+
+button, input {
+    margin: 10px;
+}
+
+#ca {
+    width: 1200px;
+    height: 100px;
+    margin: auto;
+}
+
+
+.row, .main-row{
+    display: flex;
+    height: 12px;
+}
+
+.main-row {
+    margin-bottom: 10px;
+}
+
+.main-row > .ca-on:hover {
+    background-color:rgb(97, 67, 29);
+}
+.main-row > .ca-off:hover {
+    background-color:lightcoral;
+}
+
+.cell {
+    box-sizing: border-box;
+    height: 100%;
+    flex-grow: 1;
+}
+
+
+
+.ca-on {
+    background-color:brown;
+}
+
+.ca-off {
+    background-color: burlywood;
+}
+
+/* Slider */
+#slider {
+    appearance: none;
+    margin:0px;
+    width: 1200px;
+    background: lightgray;
+    opacity: .6;
+}
+
+#slider:hover {
+    background: grey;
+    opacity: 1;
+}
+
+.slider {
+    width: 1200px;
+    margin: auto;
+    margin-bottom: 50px;
+}
+
+#sliderVal {
+
+    margin:auto;
+    text-align: center;
+}
