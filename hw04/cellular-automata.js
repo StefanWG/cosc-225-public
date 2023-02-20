@@ -5,7 +5,6 @@ function origBoxes() {
     const grid = document.getElementById("ca");
     const row = document.createElement("div");
     row.classList.add("main-row");
-    row.classList.add("row");
 
     for (let c = 0; c < NUMCOLS; c++) {
         let cell = document.createElement("div");
@@ -40,13 +39,16 @@ function origBoxes() {
     }
 
     //Add listener to button
-    const runButton = document.getElementById("runButton");
-    runButton.addEventListener("click", animate);
-
 
     const resetButton = document.getElementById("resetButton");
     resetButton.addEventListener("click", resetGrid)
 
+    const runButton = document.getElementById("runButton");
+    runButton.addEventListener("click", function() {
+        runButton.setAttribute("disabled", "true");
+        resetButton.setAttribute("disabled", "true");
+        animate();
+    });
 
     const slider = document.getElementById("slider");
     slider.addEventListener("input", function() {
@@ -109,12 +111,17 @@ function applyRule(config, rule) {
 
 function resetGrid() {
     const grid = document.getElementById("ca");
-    var rows = grid.getElementsByClassName("row");
-    //Delete Previous Rows
-    while (rows.length > 1) {
-        const secondRow = rows[1];
-        secondRow.remove();
-        rows = grid.getElementsByClassName("row");
+    const rows = grid.getElementsByClassName("row");
+    for (const row of rows) {
+        const cells = row.getElementsByClassName("cell");
+        for (const cell of cells) {
+            for (const _class of cell.classList) {
+                if (_class.match("^ca-")) {
+                    cell.classList.remove(_class)
+                }
+                cell.classList.add("ca-off");
+            }
+        }
     }
 }
 
@@ -128,24 +135,7 @@ function animate() {
     //Reset Grid
     resetGrid();
     //Draw Initial Grid
-    const rows = [];
-    for (let r = 0; r < NUMROWS; r++) {    
-        const row = document.createElement("div");
-        row.classList.add("row");
-        for (let c = 0; c < NUMCOLS; c++) {
-            let cell = document.createElement("div");
-            cell.id = "cell-"+c.toString();
-            cell.classList.add("cell");
-            if (Math.random() < 0.5) {
-                cell.classList.add("ca-off");
-            } else {
-                cell.classList.add("ca-on");
-            }
-            row.appendChild(cell);
-        }
-        grid.appendChild(row);
-        rows.push(row);
-    }
+    const rows = grid.getElementsByClassName("row");
     //Get final array
     const initConfig = getInitialArray();
     const finalConfig = [];
@@ -160,6 +150,10 @@ function animate() {
     function frame() {
         if (i == 10+NUMROWS*2) {
             clearInterval(id);
+            const resetButton = document.getElementById("resetButton");
+            const runButton = document.getElementById("runButton");
+            resetButton.removeAttribute("disabled");
+            runButton.removeAttribute("disabled");
         } else {
             for (let x = 0; x < NUMROWS; x++) {
                 const r = rows[x];

@@ -6,9 +6,15 @@ h1 {
     left:0px;
     padding-top: 25px;
     width: 100%;
-    background-color: white;
+    background-color: rgb(55, 113, 142);
     z-index:2;
+    color:rgb(220, 184, 203);
 }
+
+body {
+    background-color: rgb(55, 113, 142);
+}
+
 #root {
     position: relative;
     margin-top: 80px;
@@ -19,10 +25,16 @@ h1 {
     width: 1200px;
     justify-content: center;
     display: flex;
+    flex-grow: 1; 
 }
 
-button, input {
+button {
     margin: 10px;
+    background-color: rgb(220, 184, 203);
+    border-radius: 5px;
+    width: 80px;
+    text-align: center;
+    color: rgb(33, 69, 88);
 }
 
 #ca {
@@ -30,7 +42,6 @@ button, input {
     height: 100px;
     margin: auto;
 }
-
 
 .row, .main-row{
     display: flex;
@@ -41,27 +52,22 @@ button, input {
     margin-bottom: 10px;
 }
 
-.main-row > .ca-on:hover {
-    background-color:rgb(97, 67, 29);
-}
-.main-row > .ca-off:hover {
-    background-color:lightcoral;
+.main-row > .cell:hover {
+    filter: brightness(70%);
 }
 
 .cell {
-    box-sizing: border-box;
     height: 100%;
     flex-grow: 1;
 }
 
 
-
 .ca-on {
-    background-color:brown;
+    background-color:rgb(125, 97, 103);
 }
 
 .ca-off {
-    background-color: burlywood;
+    background-color: rgb(220, 184, 203);
 }
 
 /* Slider */
@@ -69,23 +75,21 @@ button, input {
     appearance: none;
     margin:0px;
     width: 1200px;
-    background: lightgray;
-    opacity: .6;
+    background: rgb(220, 184, 203);;
 }
 
 #slider:hover {
-    background: grey;
-    opacity: 1;
+    filter: brightness(90%);
 }
 
 .slider {
     width: 1200px;
     margin: auto;
-    margin-bottom: 50px;
 }
 
 #sliderVal {
-
+    padding: 12px;
     margin:auto;
     text-align: center;
+    color:rgb(220, 184, 203);
 }
