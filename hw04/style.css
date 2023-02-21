@@ -18,6 +18,7 @@ body {
 #root {
     position: relative;
     margin-top: 80px;
+    height: 800px;
 }
 
 .buttons {
@@ -52,15 +53,16 @@ button {
     margin-bottom: 10px;
 }
 
-.main-row > .cell:hover {
-    filter: brightness(70%);
-}
 
 .cell {
     height: 100%;
     flex-grow: 1;
 }
 
+/* Background of cell */
+.main-row > .cell:hover {
+    filter: brightness(70%);
+}
 
 .ca-on {
     background-color:rgb(125, 97, 103);

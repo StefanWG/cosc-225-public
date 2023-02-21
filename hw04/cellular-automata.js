@@ -1,5 +1,7 @@
 let NUMCOLS = 101;
 let NUMROWS = 50;
+let BREAK = false;
+let INTERVALID = null;
 
 function origBoxes() {
     const grid = document.getElementById("ca");
@@ -41,12 +43,17 @@ function origBoxes() {
     //Add listener to button
 
     const resetButton = document.getElementById("resetButton");
-    resetButton.addEventListener("click", resetGrid)
-
     const runButton = document.getElementById("runButton");
+
+    resetButton.addEventListener("click", function() {
+        clearInterval(INTERVALID);
+        INTERVALID = null;
+        resetGrid();
+        runButton.removeAttribute("disabled");
+    })
+
     runButton.addEventListener("click", function() {
         runButton.setAttribute("disabled", "true");
-        resetButton.setAttribute("disabled", "true");
         animate();
     });
 
@@ -130,7 +137,6 @@ function animate() {
     const slider = document.getElementById("slider");
     const rule = slider.value;
     const grid = document.getElementById("ca");
-    let id = null;
     let i = 0;
     //Reset Grid
     resetGrid();
@@ -144,17 +150,15 @@ function animate() {
         finalConfig.push(applyRule(finalConfig[finalConfig.length - 1], rule));
     }
     //Animate
-    clearInterval(id);
-    setInterval(frame, 0);
+    clearInterval(INTERVALID);
+    INTERVALID = setInterval(frame, 20);
 
     function frame() {
-        if (i == 10+NUMROWS*2) {
-            clearInterval(id);
-            const resetButton = document.getElementById("resetButton");
-            const runButton = document.getElementById("runButton");
-            resetButton.removeAttribute("disabled");
-            runButton.removeAttribute("disabled");
+        if (i == 10+NUMROWS*2 || BREAK) {
+            clearInterval(INTERVALID);
+            INTERVALID = null;
         } else {
+            console.log(i);
             for (let x = 0; x < NUMROWS; x++) {
                 const r = rows[x];
                 let cellNum = 0;
