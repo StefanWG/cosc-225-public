@@ -104,13 +104,11 @@ function updateCA(c) {
 function applyRule(config, rule) {
     const newConfig = [];
     for (let c = 0; c < config.length; c++) {
-        //Get neighbors above
         var ruleNum = "";
         for (let i = -1; i < 2; i++) {
-            let v = config[(c+i+NUMCOLS)%NUMCOLS];
+            let v = config[(c+i+config.length)%config.length];
             ruleNum = ruleNum + v.toString();
         }
-        // console.log("RN " + ruleNum + " " + parseInt(ruleNum, 2) + " " + (rule >> ruleNum) % 2);
         newConfig.push((rule >> parseInt(ruleNum, 2)) % 2);
     }
     return newConfig;
@@ -189,3 +187,5 @@ function animate() {
         }
     }
 }
+
+module.exports = { applyRule };
