@@ -14,6 +14,9 @@ function init() {
     currentColorButton = null;
     currentShape = "line";
     currentShapeButton = null;
+    currentAction = "draw";
+    currentActionButton = null;
+    numClicks = 0;
 
     //Set up color buttons
     const colorButtons = document.getElementById("color-buttons").getElementsByTagName("button");
@@ -45,6 +48,21 @@ function init() {
             currentShapeButton = button;
         })
     }
+
+        //Set up action buttons
+        const actionButtons = document.getElementById("action-buttons").getElementsByTagName("button");
+        for (const button of actionButtons) {
+            if (button.id == "draw") {
+                currentActionButton = button;
+                button.classList.add("current-action");
+            }
+            button.addEventListener("click", () => {
+                currentActionButton.classList.remove("current-action");
+                currentAction = button.id;
+                button.classList.add("current-action");
+                currentActionButton = button;
+            })
+        }
 }
 
 function handleClick(event) {
@@ -52,38 +70,71 @@ function handleClick(event) {
     const rect = svg.getBoundingClientRect();
     let xPos = event.clientX - rect.left;
     let yPos = event.clientY - rect.top;
-    isClicked = !isClicked;
 
-    if (isClicked) { //New Click
-        clickX = xPos;
-        clickY = yPos;
-
-        if (currentShape == "circle") {
-            const newCircle = document.createElementNS(NS, "circle");
-            newCircle.setAttribute("cx", xPos);
-            newCircle.setAttribute("cy", yPos);
-            newCircle.setAttribute("r", 0);
-            newCircle.setAttribute("style", "fill:"+currentColor);
-
-            currentShapeElem = newCircle;
-            svg.appendChild(newCircle);
-
-        } else {
-            const newLine = document.createElementNS(NS, "line");
-            newLine.setAttribute("x1", xPos);
-            newLine.setAttribute("y1", yPos);
-            newLine.setAttribute("x2", xPos);
-            newLine.setAttribute("y2", yPos);
-            newLine.setAttribute("style", "stroke:"+currentColor+";stroke-width:2");
-            currentShapeElem = newLine;
-            svg.appendChild(newLine);
+    if (isClicked && currentShape == "triangle") { //Intermediate trangle clicks
+        if (numClicks == 1) {
+            numClicks++;
+            const points = currentShapeElem.getAttribute("points");
+            currentShapeElem.setAttributeNS(null, "points", points + " "+xPos + "," + yPos)
+        } else if (numClicks == 2) {
+            const points = currentShapeElem.getAttribute("points");
+            currentShapeElem.setAttributeNS(null, "points", points + " "+xPos + "," + yPos)
+            isClicked = false;
+            numClicks = 0;
         }
+    } else {
+        isClicked = !isClicked;
 
-    } else { //Old Click
-        clickX = null;
-        clickY = null;
+        if (isClicked) { //New Click
+            clickX = xPos;
+            clickY = yPos;
+    
+            if (currentShape == "circle") {
+                const newCircle = document.createElementNS(NS, "circle");
+                newCircle.setAttributeNS(null, "cx", xPos);
+                newCircle.setAttributeNS(null, "cy", yPos);
+                newCircle.setAttributeNS(null, "r", 0);
+                newCircle.setAttributeNS(null, "fill", currentColor);
+                currentShapeElem = newCircle;
+                svg.appendChild(newCircle);
+            } else if (currentShape == "rectangle") {
+                const newRect = document.createElementNS(NS, "rect");
+                newRect.setAttributeNS(null, "x", xPos);
+                newRect.setAttributeNS(null, "y", yPos);
+                newRect.setAttributeNS(null, "width", 0);
+                newRect.setAttributeNS(null, "height", 0);
+                newRect.setAttributeNS(null, "fill", currentColor);
+                newRect.setAttributeNS(null, "startX", xPos);
+                newRect.setAttributeNS(null, "startY", yPos);
+                currentShapeElem = newRect;
+                svg.appendChild(newRect);
+            } else if (currentShape == "line") {
+                const newLine = document.createElementNS(NS, "line");
+                newLine.setAttributeNS(null, "x1", xPos);
+                newLine.setAttributeNS(null, "y1", yPos);
+                newLine.setAttributeNS(null, "x2", xPos);
+                newLine.setAttributeNS(null, "y2", yPos);
+                newLine.setAttributeNS(null, "stroke", currentColor);
+                newLine.setAttributeNS(null, "stroke-width", 2);
+                currentShapeElem = newLine;
+                svg.appendChild(newLine);
+            } else if (currentShape == "triangle") {
+                const newTri = document.createElementNS(NS, "polygon");
+                newTri.setAttributeNS(null, "points", xPos+","+yPos);
+                newTri.setAttributeNS(null, "fill", currentColor);
+                currentShapeElem = newTri;
+                svg.appendChild(newTri);
+                numClicks = 1;
+            }
+    
+        } else { //Old Click
+            clickX = null;
+            clickY = null;
+        }
     }
 }
+
+
 
 function handleMousemove(event) {
     const svg = document.getElementById("svg");
@@ -97,10 +148,26 @@ function handleMousemove(event) {
             const cy = currentShapeElem.getAttribute("cy");
             const dist = Math.sqrt(Math.abs(cx - xPos)**2 + Math.abs(cy - yPos)**2)
             currentShapeElem.setAttribute("r", dist);
-
-        } else {
-            currentShapeElem.setAttribute("x2", xPos);
-            currentShapeElem.setAttribute("y2", yPos);
+        } else if (currentShape == "rectangle") {
+            const startX = currentShapeElem.getAttribute("startX");
+            const startY = currentShapeElem.getAttribute("startY");
+            if (xPos >= startX) {
+                currentShapeElem.setAttribute("width", xPos - startX);
+            } else {
+                currentShapeElem.setAttribute("x", xPos);
+                currentShapeElem.setAttribute("width", startX - xPos);
+            }
+            if (yPos >= startY) {
+                currentShapeElem.setAttribute("height", yPos - startY);
+            } else {
+                currentShapeElem.setAttribute("y", yPos);
+                currentShapeElem.setAttribute("height", startY - yPos);
+            }
+        } else if (currentShape == "line") {
+            currentShapeElem.setAttributeNS(null, "x2", xPos);
+            currentShapeElem.setAttributeNS(null, "y2", yPos);
+        } else if (currentShape == "triangle") {
+            console.log(currentShapeElem.getAttribute("points"));
         }
     }
 }
