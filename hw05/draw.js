@@ -5,8 +5,85 @@ function Line(x1, y1, x2, y2) {
     this.y1 = y1;
     this.x2 = x2;
     this.y2 = y2;
+    this.color = null;
+    this.width = null;
+    this.elem = document.createElementNS(NS, "line");
+    this.elem.setAttributeNS(null, "x1", x1);
+    this.elem.setAttributeNS(null, "y1", y1);
+    this.elem.setAttributeNS(null, "x2", x2);
+    this.elem.setAttributeNS(null, "y2", y2);
+
+
+    this.setStroke = function(color, width) {
+        this.elem.setAttributeNS(null, "stroke", color);
+        this.color = color;
+
+        this.elem.setAttributeNS(null, "stroke-width", width);
+        this.width = width;
+    }
+
+    this.updateEndpoint = function(newX2, newY2) {
+        this.elem.setAttributeNS(null, "x2", newX2);
+        this.elem.setAttributeNS(null, "y2", newY2);
+        this.x2 = newX2;
+        this.y2 = newY2;
+    }
+
+    this.getElem = function() {
+        return this.elem;
+    }
 }
 
+function Rect(x, y, width, height, color) {
+    this.x = x;
+    this.y = y;
+    this.startX = x;
+    this.startY = y;
+    this.width = width;
+    this.height = height;
+    this.color = color;
+    this.elem = document.createElementNS(NS, "rect");
+    this.elem.setAttributeNS(null, "x", x);
+    this.elem.setAttributeNS(null, "y", y);
+    this.elem.setAttributeNS(null, "width", 0);
+    this.elem.setAttributeNS(null, "height", 0);
+    this.elem.setAttributeNS(null, "fill", color);
+
+    this.updateRect = function(newX, newY) {
+        if (newX >= this.startX) {
+            this.elem.setAttribute("width", newX - this.startX);
+        } else {
+            this.elem.setAttribute("x", newX);
+            this.x = newX
+            this.elem.setAttribute("width", this.startX - newX);
+        }
+        if (newY >= this.startY) {
+            this.elem.setAttribute("height", newY - this.startY);
+        } else {
+            this.elem.setAttribute("y", newY);
+            this.y = y;
+            this.elem.setAttribute("height", this.startY - newY);
+        }
+    }
+}
+
+function Circle(cx, cy, r, color) {
+    this.cx = cx;
+    this.cy = cy;
+    this.r = r;
+    this.color = color;
+    this.elem = document.createElementNS(NS, "circle");
+    this.elem.setAttributeNS(null, "cx", cx);
+    this.elem.setAttributeNS(null, "cy", cy);
+    this.elem.setAttributeNS(null, "r", r);
+    this.elem.setAttributeNS(null, "fill", color);
+
+    this.updateRadius = function(newX, newY) {
+        this.r = Math.sqrt(Math.abs(this.cx - newX)**2 + Math.abs(this.cy - newY)**2)
+        this.elem.setAttribute("r", this.r);
+
+    }
+}
 
 function init() {
     const svg = document.getElementById("svg");
@@ -99,34 +176,19 @@ function handleClick(event) {
             clickY = yPos;
     
             if (currentShape == "circle") {
-                const newCircle = document.createElementNS(NS, "circle");
-                newCircle.setAttributeNS(null, "cx", xPos);
-                newCircle.setAttributeNS(null, "cy", yPos);
-                newCircle.setAttributeNS(null, "r", 0);
-                newCircle.setAttributeNS(null, "fill", currentColor);
-                currentShapeElem = newCircle;
-                svg.appendChild(newCircle);
+                const circle = new Circle(xPos, yPos, 0, currentColor);
+                currentShapeElem = circle;
+                svg.appendChild(circle.elem);
             } else if (currentShape == "rectangle") {
+                const rect = new Rect(xPos, yPos, 0, 0, currentColor);
                 const newRect = document.createElementNS(NS, "rect");
-                newRect.setAttributeNS(null, "x", xPos);
-                newRect.setAttributeNS(null, "y", yPos);
-                newRect.setAttributeNS(null, "width", 0);
-                newRect.setAttributeNS(null, "height", 0);
-                newRect.setAttributeNS(null, "fill", currentColor);
-                newRect.setAttributeNS(null, "startX", xPos);
-                newRect.setAttributeNS(null, "startY", yPos);
-                currentShapeElem = newRect;
-                svg.appendChild(newRect);
+                currentShapeElem = rect;
+                svg.appendChild(rect.elem);
             } else if (currentShape == "line") {
-                const newLine = document.createElementNS(NS, "line");
-                newLine.setAttributeNS(null, "x1", xPos);
-                newLine.setAttributeNS(null, "y1", yPos);
-                newLine.setAttributeNS(null, "x2", xPos);
-                newLine.setAttributeNS(null, "y2", yPos);
-                newLine.setAttributeNS(null, "stroke", currentColor);
-                newLine.setAttributeNS(null, "stroke-width", 2);
-                currentShapeElem = newLine;
-                svg.appendChild(newLine);
+                const line = new Line(xPos, yPos, xPos, yPos);
+                line.setStroke(currentColor, 2);
+                currentShapeElem = line;
+                svg.appendChild(line.elem);
             } else if (currentShape == "triangle") {
                 const newTri = document.createElementNS(NS, "polygon");
                 newTri.setAttributeNS(null, "points", xPos+","+yPos + " " +xPos+","+yPos + " " +xPos+","+yPos);
@@ -135,7 +197,7 @@ function handleClick(event) {
                 svg.appendChild(newTri);
                 numClicks = 1;
             }
-        currentShapeElem.addEventListener("click", clickObject);
+        // currentShapeElem.addEventListener("click", clickObject);
         } else { //Old Click
             clickX = null;
             clickY = null;
@@ -151,28 +213,11 @@ function handleMousemove(event) {
 
     if (isClicked) {
         if (currentShape == "circle") {
-            const cx = currentShapeElem.getAttribute("cx");
-            const cy = currentShapeElem.getAttribute("cy");
-            const dist = Math.sqrt(Math.abs(cx - xPos)**2 + Math.abs(cy - yPos)**2)
-            currentShapeElem.setAttribute("r", dist);
+            currentShapeElem.updateRadius(xPos, yPos);
         } else if (currentShape == "rectangle") {
-            const startX = currentShapeElem.getAttribute("startX");
-            const startY = currentShapeElem.getAttribute("startY");
-            if (xPos >= startX) {
-                currentShapeElem.setAttribute("width", xPos - startX);
-            } else {
-                currentShapeElem.setAttribute("x", xPos);
-                currentShapeElem.setAttribute("width", startX - xPos);
-            }
-            if (yPos >= startY) {
-                currentShapeElem.setAttribute("height", yPos - startY);
-            } else {
-                currentShapeElem.setAttribute("y", yPos);
-                currentShapeElem.setAttribute("height", startY - yPos);
-            }
+            currentShapeElem.updateRect(xPos, yPos);
         } else if (currentShape == "line") {
-            currentShapeElem.setAttributeNS(null, "x2", xPos);
-            currentShapeElem.setAttributeNS(null, "y2", yPos);
+            currentShapeElem.updateEndpoint(xPos, yPos);
         } else if (currentShape == "triangle") {
             if (numClicks == 1) {
                 const newPoints = currentShapeElem.getAttribute("points").split(" ")[0] + " " + xPos+","+yPos + " " + xPos+","+(yPos+3);
@@ -197,7 +242,5 @@ function clickObject(event) {
         target.setAttributeNS(null, "stroke-width", 3);
         target.setAttributeNS(null, "clicked", true);
     }
-
-
 }
 
