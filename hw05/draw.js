@@ -120,7 +120,7 @@ function handleClick(event) {
                 svg.appendChild(newLine);
             } else if (currentShape == "triangle") {
                 const newTri = document.createElementNS(NS, "polygon");
-                newTri.setAttributeNS(null, "points", xPos+","+yPos);
+                newTri.setAttributeNS(null, "points", xPos+","+yPos + " " +xPos+","+yPos + " " +xPos+","+yPos);
                 newTri.setAttributeNS(null, "fill", currentColor);
                 currentShapeElem = newTri;
                 svg.appendChild(newTri);
@@ -167,7 +167,13 @@ function handleMousemove(event) {
             currentShapeElem.setAttributeNS(null, "x2", xPos);
             currentShapeElem.setAttributeNS(null, "y2", yPos);
         } else if (currentShape == "triangle") {
-            console.log(currentShapeElem.getAttribute("points"));
+            if (numClicks == 1) {
+                const newPoints = currentShapeElem.getAttribute("points").split(" ")[0] + " " + xPos+","+yPos + " " + xPos+","+(yPos+3)
+                currentShapeElem.setAttributeNS(null, "points", newPoints)
+            } else if (numClicks == 2) {
+                const newPoints = currentShapeElem.getAttribute("points").split(" ")[0] + " " + currentShapeElem.getAttribute("points").split(" ")[1] + " " + xPos+","+yPos
+                currentShapeElem.setAttributeNS(null, "points", newPoints)
+            }
         }
     }
 }
