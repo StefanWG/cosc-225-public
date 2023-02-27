@@ -1,5 +1,13 @@
 let NS = "http://www.w3.org/2000/svg";
 
+function Line(x1, y1, x2, y2) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+}
+
+
 function init() {
     const svg = document.getElementById("svg");
     svg.addEventListener("click", (handleClick));
@@ -66,6 +74,7 @@ function init() {
 }
 
 function handleClick(event) {
+    if (currentAction == "move") {return null;}
     const svg = document.getElementById("svg");
     const rect = svg.getBoundingClientRect();
     let xPos = event.clientX - rect.left;
@@ -126,15 +135,13 @@ function handleClick(event) {
                 svg.appendChild(newTri);
                 numClicks = 1;
             }
-    
+        currentShapeElem.addEventListener("click", clickObject);
         } else { //Old Click
             clickX = null;
             clickY = null;
         }
     }
 }
-
-
 
 function handleMousemove(event) {
     const svg = document.getElementById("svg");
@@ -168,13 +175,29 @@ function handleMousemove(event) {
             currentShapeElem.setAttributeNS(null, "y2", yPos);
         } else if (currentShape == "triangle") {
             if (numClicks == 1) {
-                const newPoints = currentShapeElem.getAttribute("points").split(" ")[0] + " " + xPos+","+yPos + " " + xPos+","+(yPos+3)
-                currentShapeElem.setAttributeNS(null, "points", newPoints)
+                const newPoints = currentShapeElem.getAttribute("points").split(" ")[0] + " " + xPos+","+yPos + " " + xPos+","+(yPos+3);
+                currentShapeElem.setAttributeNS(null, "points", newPoints);
             } else if (numClicks == 2) {
-                const newPoints = currentShapeElem.getAttribute("points").split(" ")[0] + " " + currentShapeElem.getAttribute("points").split(" ")[1] + " " + xPos+","+yPos
-                currentShapeElem.setAttributeNS(null, "points", newPoints)
+                const newPoints = currentShapeElem.getAttribute("points").split(" ")[0] + " " + currentShapeElem.getAttribute("points").split(" ")[1] + " " + xPos+","+yPos;
+                currentShapeElem.setAttributeNS(null, "points", newPoints);
             }
         }
     }
+}
+
+function clickObject(event) {
+    if (currentAction == "draw") {return null;}
+    const target = event.target;
+    if (target.hasAttributeNS(null, "clicked")) {
+        target.setAttributeNS(null, "stroke", "black");
+        target.setAttributeNS(null, "stroke-width", 0);
+        target.removeAttributeNS(null, "clicked");
+    } else {
+        target.setAttributeNS(null, "stroke", "black");
+        target.setAttributeNS(null, "stroke-width", 3);
+        target.setAttributeNS(null, "clicked", true);
+    }
+
+
 }
 
