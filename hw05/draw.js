@@ -72,16 +72,49 @@ function Circle(cx, cy, r, color) {
     this.cy = cy;
     this.r = r;
     this.color = color;
+    this.moving = false;
+    this.movingDiffX = null;
+    this.movingDiffY = null;
     this.elem = document.createElementNS(NS, "circle");
     this.elem.setAttributeNS(null, "cx", cx);
     this.elem.setAttributeNS(null, "cy", cy);
     this.elem.setAttributeNS(null, "r", r);
     this.elem.setAttributeNS(null, "fill", color);
+    this.elem.addEventListener("click", (event)=> {
+        if (currentAction == "move") {
+            this.moving = !this.moving;
+            if (this.moving) {
+                //Move child to front
+                const children = svg.children;
+                for (const child of children) {
+                    if (child == this.elem) {
+                        child.remove();
+                        svg.appendChild(child);
+                    }
+                }
+                const rect = svg.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                this.movingDiffX= this.cx - x;
+                this.movingDiffY = this.cy - y;
+            }
+        }
+    });
+    this.elem.addEventListener("mousemove", (event) => {
+        if (currentAction == "move" && this.moving) {
+            const rect = svg.getBoundingClientRect();
+            const xPos = (event.clientX - rect.left);
+            const yPos = (event.clientY - rect.top);
+            this.elem.setAttributeNS(null, "cx", xPos + this.movingDiffX);
+            this.elem.setAttributeNS(null, "cy", yPos + this.movingDiffY);
+            this.cx = xPos + this.movingDiffX;
+            this.cy = yPos + this.movingDiffY;
+        }
+    });
 
     this.updateRadius = function(newX, newY) {
         this.r = Math.sqrt(Math.abs(this.cx - newX)**2 + Math.abs(this.cy - newY)**2)
         this.elem.setAttribute("r", this.r);
-
     }
 }
 
@@ -197,7 +230,6 @@ function handleClick(event) {
                 svg.appendChild(newTri);
                 numClicks = 1;
             }
-        // currentShapeElem.addEventListener("click", clickObject);
         } else { //Old Click
             clickX = null;
             clickY = null;
@@ -230,17 +262,4 @@ function handleMousemove(event) {
     }
 }
 
-function clickObject(event) {
-    if (currentAction == "draw") {return null;}
-    const target = event.target;
-    if (target.hasAttributeNS(null, "clicked")) {
-        target.setAttributeNS(null, "stroke", "black");
-        target.setAttributeNS(null, "stroke-width", 0);
-        target.removeAttributeNS(null, "clicked");
-    } else {
-        target.setAttributeNS(null, "stroke", "black");
-        target.setAttributeNS(null, "stroke-width", 3);
-        target.setAttributeNS(null, "clicked", true);
-    }
-}
 
