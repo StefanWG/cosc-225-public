@@ -1,6 +1,6 @@
 let NS = "http://www.w3.org/2000/svg";
 
-function Line(x1, y1, x2, y2) {
+function Line(x1, y1, x2, y2, color) {
     this.x1 = x1;
     this.y1 = y1;
     this.x2 = x2;
@@ -11,22 +11,16 @@ function Line(x1, y1, x2, y2) {
     this.movingDiffX2 = null;
     this.movingDiffY2 = null;
 
-    this.color = null;
-    this.width = null;
+    this.color = color;
+    this.width = 8;
     this.elem = document.createElementNS(NS, "line");
     this.elem.setAttributeNS(null, "x1", x1);
     this.elem.setAttributeNS(null, "y1", y1);
     this.elem.setAttributeNS(null, "x2", x2);
     this.elem.setAttributeNS(null, "y2", y2);
 
-
-    this.setStroke = function(color, width) {
-        this.elem.setAttributeNS(null, "stroke", color);
-        this.color = color;
-
-        this.elem.setAttributeNS(null, "stroke-width", width);
-        this.width = width;
-    }
+    this.elem.setAttributeNS(null, "stroke", color);
+    this.elem.setAttributeNS(null, "stroke-width", this.width);
 
     this.updateEndpoint = function(newX2, newY2) {
         this.elem.setAttributeNS(null, "x2", newX2);
@@ -175,9 +169,36 @@ function Circle(cx, cy, r, color) {
 function Triangle(x, y, color) {
     this.x1 = x;
     this.y1 = y;
+    this.x2 = null;
+    this.y2 = null;
+    this.x3 = null;
+    this.y3 = null;
+    this.numClicks = 1;
     this.color = color;
     this.elem = document.createElementNS(NS, "polygon");
     this.elem.setAttributeNS(null, "fill", color);
+    this.elem.setAttributeNS(null, "points", x+","+y + " "+x+","+y + " "+x+","+y);
+
+    this.setP2 = function(x, y) {
+        this.x2 = x;
+        this.y2 = y;
+        this.elem.setAttributeNS(null, "points", this.x1+","+this.y1 + " "+x+","+y + " "+x+","+(y+3));
+        this.numClicks ++;
+    }
+    this.setP3 = function(x, y) {
+        this.x3 = x;
+        this.y3 = y;
+        this.elem.setAttributeNS(null, "points", this.x1+","+this.y1 + " "+this.x2+","+this.y2 + " "+x+","+y);
+        this.numClicks ++;
+    }
+
+    this.updatePoints = function(x, y) {
+        if (numClicks == 1) {
+            this.elem.setAttributeNS(null, "points", this.x1+","+this.y1+ " " + x+","+y + " " + x+","+(y+3));
+        } else if (numClicks == 2) {
+            this.elem.setAttributeNS(null, "points", this.x1+","+this.y1+ " " + this.x2+","+this.y2+" "+x+","+y);
+        }
+    }
 }
 
 function init() {
@@ -255,11 +276,9 @@ function handleClick(event) {
     if (isClicked && currentShape == "triangle") { //Intermediate trangle clicks
         if (numClicks == 1) {
             numClicks++;
-            const points = currentShapeElem.getAttribute("points");
-            currentShapeElem.setAttributeNS(null, "points", points + " "+xPos + "," + yPos)
+            currentShapeElem.setP2(xPos, yPos);
         } else if (numClicks == 2) {
-            const points = currentShapeElem.getAttribute("points");
-            currentShapeElem.setAttributeNS(null, "points", points + " "+xPos + "," + yPos)
+            currentShapeElem.setP3(xPos, yPos);
             isClicked = false;
             numClicks = 0;
         }
@@ -280,16 +299,13 @@ function handleClick(event) {
                 currentShapeElem = rect;
                 svg.appendChild(rect.elem);
             } else if (currentShape == "line") {
-                const line = new Line(xPos, yPos, xPos, yPos);
-                line.setStroke(currentColor, 8);
+                const line = new Line(xPos, yPos, xPos, yPos, currentColor);
                 currentShapeElem = line;
                 svg.appendChild(line.elem);
             } else if (currentShape == "triangle") {
-                const newTri = document.createElementNS(NS, "polygon");
-                newTri.setAttributeNS(null, "points", xPos+","+yPos + " " +xPos+","+yPos + " " +xPos+","+yPos);
-                newTri.setAttributeNS(null, "fill", currentColor);
-                currentShapeElem = newTri;
-                svg.appendChild(newTri);
+                const tri = new Triangle(xPos, yPos, currentColor)
+                currentShapeElem = tri;
+                svg.appendChild(tri.elem);
                 numClicks = 1;
             }
         } else { //Old Click
@@ -313,13 +329,7 @@ function handleMousemove(event) {
         } else if (currentShape == "line") {
             currentShapeElem.updateEndpoint(xPos, yPos);
         } else if (currentShape == "triangle") {
-            if (numClicks == 1) {
-                const newPoints = currentShapeElem.getAttribute("points").split(" ")[0] + " " + xPos+","+yPos + " " + xPos+","+(yPos+3);
-                currentShapeElem.setAttributeNS(null, "points", newPoints);
-            } else if (numClicks == 2) {
-                const newPoints = currentShapeElem.getAttribute("points").split(" ")[0] + " " + currentShapeElem.getAttribute("points").split(" ")[1] + " " + xPos+","+yPos;
-                currentShapeElem.setAttributeNS(null, "points", newPoints);
-            }
+            currentShapeElem.updatePoints(xPos, yPos);
         }
     }
 }
@@ -327,7 +337,7 @@ function handleMousemove(event) {
 function moveElemToFront(elem) {
     const children = svg.children;
     for (const child of children) {
-        if (child == this.elem) {
+        if (child == elem) {
             child.remove();
             svg.appendChild(child);
         }
