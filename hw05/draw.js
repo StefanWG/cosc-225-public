@@ -173,8 +173,15 @@ function Triangle(x, y, color) {
     this.y2 = null;
     this.x3 = null;
     this.y3 = null;
+    this.moving = false;
     this.numClicks = 1;
     this.color = color;
+    this.movingDiffX1 = null;
+    this.movingDiffY1 = null;
+    this.movingDiffX2 = null;
+    this.movingDiffY2 = null;
+    this.movingDiffX3 = null;
+    this.movingDiffY3 = null;
     this.elem = document.createElementNS(NS, "polygon");
     this.elem.setAttributeNS(null, "fill", color);
     this.elem.setAttributeNS(null, "points", x+","+y + " "+x+","+y + " "+x+","+y);
@@ -199,6 +206,39 @@ function Triangle(x, y, color) {
             this.elem.setAttributeNS(null, "points", this.x1+","+this.y1+ " " + this.x2+","+this.y2+" "+x+","+y);
         }
     }
+
+
+    this.elem.addEventListener("click", (event)=> {
+        if (currentAction == "move") {
+            this.moving = !this.moving;
+            if (this.moving) {
+                moveElemToFront(this.elem);
+                const rect = svg.getBoundingClientRect();
+                const xPos = event.clientX - rect.left;
+                const yPos = event.clientY - rect.top;
+                this.movingDiffX1 = this.x1 - xPos;
+                this.movingDiffY1 = this.y1 - yPos;
+                this.movingDiffX2 = this.x2 - xPos;
+                this.movingDiffY2 = this.y2 - yPos;
+                this.movingDiffX3 = this.x3 - xPos;
+                this.movingDiffY3 = this.y3 - yPos;
+            }
+        }
+    });
+    this.elem.addEventListener("mousemove", (event) => {
+        if (currentAction == "move" && this.moving) {
+            const rect = svg.getBoundingClientRect();
+            const xPos = (event.clientX - rect.left);
+            const yPos = (event.clientY - rect.top);
+            this.x1 = xPos + this.movingDiffX1;
+            this.y1 = yPos + this.movingDiffY1;
+            this.x2 = xPos + this.movingDiffX2;
+            this.y2 = yPos + this.movingDiffY2;
+            this.x3 = xPos + this.movingDiffX3;
+            this.y3 = yPos + this.movingDiffY3;
+            this.elem.setAttributeNS(null, "points", this.x1+","+this.y1+" "+this.x2+","+this.y2+" "+this.x3+","+this.y3)
+        }
+    });
 }
 
 function init() {
@@ -343,5 +383,3 @@ function moveElemToFront(elem) {
         }
     }
 }
-
-
