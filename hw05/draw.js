@@ -5,6 +5,12 @@ function Line(x1, y1, x2, y2) {
     this.y1 = y1;
     this.x2 = x2;
     this.y2 = y2;
+    this.moving = false;
+    this.movingDiffX1 = null;
+    this.movingDiffY1 = null;
+    this.movingDiffX2 = null;
+    this.movingDiffY2 = null;
+
     this.color = null;
     this.width = null;
     this.elem = document.createElementNS(NS, "line");
@@ -29,9 +35,36 @@ function Line(x1, y1, x2, y2) {
         this.y2 = newY2;
     }
 
-    this.getElem = function() {
-        return this.elem;
-    }
+    this.elem.addEventListener("click", (event)=> {
+        if (currentAction == "move") {
+            this.moving = !this.moving;
+            if (this.moving) {
+                moveElemToFront(this.elem);
+                const rect = svg.getBoundingClientRect();
+                const xPos = event.clientX - rect.left;
+                const yPos = event.clientY - rect.top;
+                this.movingDiffX1 = this.x1 - xPos;
+                this.movingDiffY1 = this.y1 - yPos;
+                this.movingDiffX2 = this.x2 - xPos;
+                this.movingDiffY2 = this.y2 - yPos;
+            }
+        }
+    });
+    this.elem.addEventListener("mousemove", (event) => {
+        if (currentAction == "move" && this.moving) {
+            const rect = svg.getBoundingClientRect();
+            const xPos = (event.clientX - rect.left);
+            const yPos = (event.clientY - rect.top);
+            this.elem.setAttributeNS(null, "x1", xPos + this.movingDiffX1);
+            this.elem.setAttributeNS(null, "y1", yPos + this.movingDiffY1);
+            this.elem.setAttributeNS(null, "x2", xPos + this.movingDiffX2);
+            this.elem.setAttributeNS(null, "y2", yPos + this.movingDiffY2);
+            this.x1 = xPos + this.movingDiffX1;
+            this.y1 = yPos + this.movingDiffY1;
+            this.x2 = xPos + this.movingDiffX2;
+            this.y2 = yPos + this.movingDiffY2;
+        }
+    });
 }
 
 function Rect(x, y, width, height, color) {
@@ -42,6 +75,9 @@ function Rect(x, y, width, height, color) {
     this.width = width;
     this.height = height;
     this.color = color;
+    this.movingDiffX = null;
+    this.movingDiffY = null;
+    this.moving = false;
     this.elem = document.createElementNS(NS, "rect");
     this.elem.setAttributeNS(null, "x", x);
     this.elem.setAttributeNS(null, "y", y);
@@ -65,6 +101,31 @@ function Rect(x, y, width, height, color) {
             this.elem.setAttribute("height", this.startY - newY);
         }
     }
+
+    this.elem.addEventListener("click", (event)=> {
+        if (currentAction == "move") {
+            this.moving = !this.moving;
+            if (this.moving) {
+                moveElemToFront(this.elem);
+                const rect = svg.getBoundingClientRect();
+                const xPos = event.clientX - rect.left;
+                const yPos = event.clientY - rect.top;
+                this.movingDiffX = this.x - xPos;
+                this.movingDiffY = this.y - yPos;
+            }
+        }
+    });
+    this.elem.addEventListener("mousemove", (event) => {
+        if (currentAction == "move" && this.moving) {
+            const rect = svg.getBoundingClientRect();
+            const xPos = (event.clientX - rect.left);
+            const yPos = (event.clientY - rect.top);
+            this.elem.setAttributeNS(null, "x", xPos + this.movingDiffX);
+            this.elem.setAttributeNS(null, "y", yPos + this.movingDiffY);
+            this.x = xPos + this.movingDiffX;
+            this.y = yPos + this.movingDiffY;
+        }
+    });
 }
 
 function Circle(cx, cy, r, color) {
@@ -84,14 +145,7 @@ function Circle(cx, cy, r, color) {
         if (currentAction == "move") {
             this.moving = !this.moving;
             if (this.moving) {
-                //Move child to front
-                const children = svg.children;
-                for (const child of children) {
-                    if (child == this.elem) {
-                        child.remove();
-                        svg.appendChild(child);
-                    }
-                }
+                moveElemToFront(this.elem);
                 const rect = svg.getBoundingClientRect();
                 const x = event.clientX - rect.left;
                 const y = event.clientY - rect.top;
@@ -116,6 +170,14 @@ function Circle(cx, cy, r, color) {
         this.r = Math.sqrt(Math.abs(this.cx - newX)**2 + Math.abs(this.cy - newY)**2)
         this.elem.setAttribute("r", this.r);
     }
+}
+
+function Triangle(x, y, color) {
+    this.x1 = x;
+    this.y1 = y;
+    this.color = color;
+    this.elem = document.createElementNS(NS, "polygon");
+    this.elem.setAttributeNS(null, "fill", color);
 }
 
 function init() {
@@ -219,7 +281,7 @@ function handleClick(event) {
                 svg.appendChild(rect.elem);
             } else if (currentShape == "line") {
                 const line = new Line(xPos, yPos, xPos, yPos);
-                line.setStroke(currentColor, 2);
+                line.setStroke(currentColor, 8);
                 currentShapeElem = line;
                 svg.appendChild(line.elem);
             } else if (currentShape == "triangle") {
@@ -258,6 +320,16 @@ function handleMousemove(event) {
                 const newPoints = currentShapeElem.getAttribute("points").split(" ")[0] + " " + currentShapeElem.getAttribute("points").split(" ")[1] + " " + xPos+","+yPos;
                 currentShapeElem.setAttributeNS(null, "points", newPoints);
             }
+        }
+    }
+}
+
+function moveElemToFront(elem) {
+    const children = svg.children;
+    for (const child of children) {
+        if (child == this.elem) {
+            child.remove();
+            svg.appendChild(child);
         }
     }
 }
