@@ -91,7 +91,7 @@ function Rect(x, y, width, height, color) {
             this.elem.setAttribute("height", newY - this.startY);
         } else {
             this.elem.setAttribute("y", newY);
-            this.y = y;
+            this.y = newY;
             this.elem.setAttribute("height", this.startY - newY);
         }
     }
@@ -106,18 +106,20 @@ function Rect(x, y, width, height, color) {
                 const yPos = event.clientY - rect.top;
                 this.movingDiffX = this.x - xPos;
                 this.movingDiffY = this.y - yPos;
+                console.log(this.y + " " + this.x);
             }
         }
     });
     this.elem.addEventListener("mousemove", (event) => {
         if (currentAction == "move" && this.moving) {
             const rect = svg.getBoundingClientRect();
-            const xPos = (event.clientX - rect.left);
-            const yPos = (event.clientY - rect.top);
+            const xPos = event.clientX - rect.left;
+            const yPos = event.clientY - rect.top;
             this.elem.setAttributeNS(null, "x", xPos + this.movingDiffX);
             this.elem.setAttributeNS(null, "y", yPos + this.movingDiffY);
             this.x = xPos + this.movingDiffX;
             this.y = yPos + this.movingDiffY;
+            console.log(this.y);
         }
     });
 }

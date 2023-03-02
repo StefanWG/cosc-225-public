@@ -6,6 +6,8 @@ header {
 
 .content {
     margin-top: 50px;
+    width: 600px;
+    margin:auto;
 }
 
 #svg {
@@ -77,4 +79,10 @@ header {
 .current-action {
     background-color: white !important;
     opacity: 1 !important;
+}
+
+/* Instructions */
+p {
+    text-align: center;
+    font-weight: bold;
 }
