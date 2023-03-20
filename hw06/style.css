@@ -1,0 +1,31 @@
+#svg {
+    width: 600px;
+    height: 400px;
+    background-color: lightgray;
+}
+
+#content {
+    width: 600px;
+    margin: auto;
+}
+
+.point {
+    fill: green;
+    stroke: black;
+    stroke-width: 3px;
+    r: 10px;
+}
+
+.point:hover {
+    fill: lightgreen;
+}
+
+.point .selected {
+    stroke: red;
+}
+
+.line {
+    stroke: darkgreen;
+    stroke-width: 5px;
+}
+
